@@ -12,13 +12,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatBasico">
         <activity
-            android:name=".MainActivity"
+            android:name=".registrarte"
+            android:exported="false">
+
+        </activity>
+
+        <activity
+            android:name=".PantallaCarga"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".chat"
+            android:exported="false">
+
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false">
+
         </activity>
     </application>
 
