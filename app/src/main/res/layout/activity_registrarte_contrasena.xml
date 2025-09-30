@@ -9,7 +9,7 @@
     android:gravity="center"
     android:layout_margin="20dp"
     android:weightSum="100"
-    tools:context=".registrarte">
+    tools:context=".RegistrarteContrasena">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,35 +47,45 @@
                 android:text="2"/>
         </RelativeLayout>
     </LinearLayout>
-    
+
     <ImageView
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/user"
-        app:tint="@color/black"/>
+        android:src="@drawable/password"
+        app:tint="@color/black"
+        android:layout_weight="20"
+        />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="introduzca su nombre de usuario"
-        android:layout_gravity="center"
+        android:text="introdusca su nueva contraseña"
+        android:layout_gravity="center_vertical"
+        android:letterSpacing="0.08"
         android:textStyle="bold"
-        android:textSize="25sp"/>
+        android:textSize="25sp"
+        android:layout_weight="5"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_weight="5">
+
+
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:hint="Nombre de usuario"
-            android:inputType="text"
+            android:hint="contraseña"
+            android:inputType="textPassword"
+            android:maxLength="6"
             android:layout_margin="10dp"
             android:background="@drawable/rectangulo_redondo"
             android:elevation="5dp"
-            android:id="@+id/nombre_usuario"
+            android:id="@+id/Contasena_usuario"
             />
 
     </LinearLayout>
@@ -84,15 +94,14 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:gravity="center_vertical"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:layout_weight="10">
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="continuar"
-            android:id="@+id/boton_continuar"/>
-
-    </LinearLayout>
+            android:text="Finalizar"
+            android:id="@+id/Boton_finalizar"/>
+        </LinearLayout>
 
 
 </LinearLayout>
