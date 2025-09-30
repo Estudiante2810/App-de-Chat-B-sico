@@ -20,7 +20,7 @@ public class PantallaCarga extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(PantallaCarga.this,registrarte.class));
+                startActivity(new Intent(PantallaCarga.this,Inicio_seccion.class));
                 finish();
             }
         },4000);

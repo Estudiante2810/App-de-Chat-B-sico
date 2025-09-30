@@ -12,11 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatBasico">
         <activity
+            android:name=".Inicio_seccion"
+            android:exported="false">
+
+        </activity>
+        <activity
             android:name=".RegistrarteContrasena"
-            android:exported="false" />
+            android:exported="false"></activity>
         <activity
             android:name=".registrarte"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".PantallaCarga"
             android:exported="true">
@@ -28,10 +33,10 @@
         </activity>
         <activity
             android:name=".chat"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
     </application>
 
 </manifest>
