@@ -14,6 +14,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegistrarteContrasena extends AppCompatActivity {
 
@@ -21,6 +25,7 @@ public class RegistrarteContrasena extends AppCompatActivity {
     EditText contrasena;
     Button botonFinalizar;
     FirebaseAuth mAuth;
+    FirebaseFirestore database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +38,9 @@ public class RegistrarteContrasena extends AppCompatActivity {
             return insets;
         });
 
-        // Inicializar Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseFirestore.getInstance();
 
-        // Obtener el nombre del usuario desde el Intent
         Intent intent = getIntent();
         nombre = intent.getStringExtra("nombre_usuario");
 
@@ -60,15 +64,13 @@ public class RegistrarteContrasena extends AppCompatActivity {
                 Toast.makeText(this, "Error: No se pudo obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
                 return;
             }
-            
-            // Crear usuario en Firebase
+
             crearUsuarioFirebase(nombre, password);
         });
 
     }
 
     private void crearUsuarioFirebase(String nombreUsuario, String password) {
-        // Generar un email único basado en el nombre del usuario
         String email = nombreUsuario.toLowerCase().replaceAll("\\s+", "") + "@chatbasico.com";
         
         // Mostrar loading
@@ -83,13 +85,10 @@ public class RegistrarteContrasena extends AppCompatActivity {
                         // Usuario creado exitosamente
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            Toast.makeText(RegistrarteContrasena.this, 
-                                "Usuario creado exitosamente: " + nombreUsuario, 
-                                Toast.LENGTH_LONG).show();
-                            
-                            // Aquí puedes navegar a la siguiente pantalla
-                            // Por ejemplo, regresar al login o ir directamente al chat
-                            finish(); // Cierra esta actividad
+                            // Guardar usuario en Firestore
+                            guardarUsuarioEnFirestore(user.getUid(), nombreUsuario, email);
+                            Intent intent = new Intent(this, Inicio_seccion.class);
+                            startActivity(intent);
                         }
                     } else {
                         // Error al crear usuario
@@ -108,6 +107,30 @@ public class RegistrarteContrasena extends AppCompatActivity {
                         }
                         Toast.makeText(RegistrarteContrasena.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
+                });
+    }
+
+    private void guardarUsuarioEnFirestore(String userId, String nombreUsuario, String email) {
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("id", userId);
+        usuario.put("nombre", nombreUsuario);
+        usuario.put("email", email);
+        usuario.put("fcmToken", ""); // Se actualizará después
+        usuario.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+        
+        database.collection("users")
+                .document(userId)
+                .set(usuario)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(RegistrarteContrasena.this, 
+                        "Usuario creado exitosamente: " + nombreUsuario, 
+                        Toast.LENGTH_LONG).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(RegistrarteContrasena.this, 
+                        "Error al guardar datos del usuario", 
+                        Toast.LENGTH_LONG).show();
                 });
     }
 }

@@ -56,10 +56,8 @@ public class Inicio_seccion extends AppCompatActivity {
 
         // Configurar click listener para ir al registro
         texto_registrarse.setOnClickListener(v -> {
-            // Aquí puedes agregar la navegación a la pantalla de registro
-            // Intent intent = new Intent(Inicio_seccion.this, RegistrarteNombre.class);
-            // startActivity(intent);
-            Toast.makeText(this, "Navegar a registro", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Inicio_seccion.this, registrarte.class);
+            startActivity(intent);
         });
     }
 
@@ -95,18 +93,17 @@ public class Inicio_seccion extends AppCompatActivity {
                     iniciar_seccion.setEnabled(true);
                     
                     if (task.isSuccessful()) {
-                        // Inicio de sesión exitoso
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
                             Toast.makeText(Inicio_seccion.this, 
                                 "¡Bienvenido " + nombreUsuario + "!", 
                                 Toast.LENGTH_LONG).show();
                             
-                            // Aquí puedes navegar a la pantalla principal del chat
-                            // Intent intent = new Intent(Inicio_seccion.this, MainActivity.class);
-                            // intent.putExtra("nombre_usuario", nombreUsuario);
-                            // startActivity(intent);
-                            // finish(); // Cierra esta actividad
+                            // Navegar a la pantalla principal del chat
+                            Intent intent = new Intent(Inicio_seccion.this, MainChats.class);
+                            intent.putExtra("nombre_usuario", nombreUsuario);
+                            startActivity(intent);
+                            finish(); // Cierra esta actividad
                         }
                     } else {
                         // Error al iniciar sesión
@@ -119,13 +116,7 @@ public class Inicio_seccion extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Verificar si el usuario ya está autenticado
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            // Usuario ya está logueado, puedes redirigir directamente
-            // Intent intent = new Intent(Inicio_seccion.this, MainActivity.class);
-            // startActivity(intent);
-            // finish();
-        }
+        // La verificación de autenticación automática se maneja ahora en PantallaCarga
+        // para evitar redirecciones duplicadas
     }
 }
