@@ -84,6 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Iniciar Sesión"
+            android:backgroundTint="@color/azul"
             android:id="@+id/Boton_iniciarSeccion"/>
     </LinearLayout>
 

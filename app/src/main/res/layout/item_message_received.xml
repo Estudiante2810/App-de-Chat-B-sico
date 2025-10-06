@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/rectangulo_redondo"
-        android:backgroundTint="@color/gray"
+        android:backgroundTint="@color/white"
         android:padding="12dp"
         android:maxWidth="280dp">
 
