@@ -263,12 +263,14 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
     @Override
     public void onUserClick(Usuario usuario) {
         Log.d(TAG, "Click en usuario: " + usuario.nombre + " (ID: " + usuario.id + ")");
-        showToast("Usuario seleccionado: " + usuario.nombre);
-        // TODO: Abrir chat con este usuario
-        // Intent intent = new Intent(this, ChatActivity.class);
-        // intent.putExtra("usuario_seleccionado", usuario.nombre);
-        // intent.putExtra("usuario_id", usuario.id);
-        // startActivity(intent);
+        showToast("Abriendo chat con " + usuario.nombre);
+        
+        // Abrir chat con este usuario
+        Intent intent = new Intent(this, chats.class);
+        intent.putExtra("usuario_seleccionado", usuario.nombre);
+        intent.putExtra("usuario_id", usuario.id);
+        intent.putExtra("current_user_name", nombreUsuario);
+        startActivity(intent);
     }
 
     // Clase simple para representar un usuario

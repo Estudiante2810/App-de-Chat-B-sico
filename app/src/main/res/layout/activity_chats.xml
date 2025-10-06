@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".chats">
+
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:background="@drawable/rectangulo_redondo"
+        android:backgroundTint="@color/black"
+        android:elevation="5dp">
+
+        <ImageView
+            android:id="@+id/imageSignOut"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/cicular_bg"
+            android:backgroundTint="@color/white"
+            android:padding="6dp"
+            android:src="@drawable/salir"
+            app:tint="@color/azul"
+            android:contentDescription="Regresar" />
+
+        <TextView
+            android:id="@+id/textUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/conversationRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_layout"
+        android:layout_below="@id/header_layout"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:padding="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:padding="8dp"
+        android:id="@+id/bottom_layout">
+
+        <ImageButton
+            android:id="@+id/image_select_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_image"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/black"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Seleccionar imagen" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@id/image_select_btn"
+            android:layout_toLeftOf="@id/message_send_btn"
+            android:background="@drawable/rectangulo_redondo"
+            android:elevation="4dp"
+            android:hint="Write message here"
+            android:padding="10dp"
+            android:id="@+id/chat_message_input"/>
+
+        <ImageButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/enviar"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/black"
+            android:id="@+id/message_send_btn"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>

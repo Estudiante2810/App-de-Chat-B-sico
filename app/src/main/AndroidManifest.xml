@@ -2,6 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos para manejar imágenes -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Permiso para Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,14 +21,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatBasico">
         <activity
-            android:name=".usuario"
+            android:name=".chats"
             android:exported="false" />
         <activity
             android:name=".MainChats"
             android:exported="false" />
         <activity
             android:name=".Inicio_seccion"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".RegistrarteContrasena"
             android:exported="false" />
@@ -35,9 +44,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".chat"
-            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
