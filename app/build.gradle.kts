@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -30,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
@@ -44,7 +48,14 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.storage)
     implementation(libs.glide)
+    implementation(libs.core.ktx)
+
+    // Agregar OkHttp para envío de notificaciones
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.firebase.messaging)
+    implementation("com.google.firebase:firebase-analytics-ktx:22.5.0")
 }
