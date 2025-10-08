@@ -229,25 +229,42 @@ public class chats extends AppCompatActivity {
 
         Log.d(TAG, "📤 Enviando notificación al token: " + token);
 
-        // Crear documento de notificación en Firestore
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("recipientId", receiverUserId);
-        notification.put("recipientName", receiverUserName);
-        notification.put("senderId", currentUserId);
-        notification.put("senderName", currentUserName);
-        notification.put("fcmToken", token);
-        notification.put("messageText", messageText);
-        notification.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
-        notification.put("read", false);
+        // Generar un ID único para esta notificación basado en la conversación y el mensaje
+        String notificationId = conversationId + "_" + messageText.hashCode();
 
-        // Guardar la notificación en Firestore (esto activará la Cloud Function)
+        // Verificar si la notificación ya existe en Firestore
         database.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d(TAG, "✅ Notificación registrada en Firestore con ID: " + documentReference.getId());
+                .document(notificationId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Log.d(TAG, "⚠️ Notificación ya registrada en Firestore con ID: " + notificationId);
+                        return;
+                    }
+
+                    // Crear documento de notificación en Firestore
+                    Map<String, Object> notification = new HashMap<>();
+                    notification.put("recipientId", receiverUserId);
+                    notification.put("recipientName", receiverUserName);
+                    notification.put("senderId", currentUserId);
+                    notification.put("senderName", currentUserName);
+                    notification.put("fcmToken", token);
+                    notification.put("messageText", messageText);
+                    notification.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
+                    notification.put("read", false);
+
+                    database.collection("notifications")
+                            .document(notificationId)
+                            .set(notification)
+                            .addOnSuccessListener(unused -> {
+                                Log.d(TAG, "✅ Notificación registrada en Firestore con ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "❌ Error al registrar notificación en Firestore", e);
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "❌ Error al registrar notificación en Firestore", e);
+                    Log.e(TAG, "❌ Error al verificar notificación en Firestore", e);
                 });
     }
     private void loadMessages() {

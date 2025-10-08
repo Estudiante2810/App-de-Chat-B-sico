@@ -17,6 +17,7 @@ import android.util.Log
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private val TAG = "FCMService"
+    private val displayedNotifications = mutableSetOf<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -93,6 +94,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(title: String?, messageBody: String?) {
+        val notificationId = "$title-$messageBody" // Unique identifier for the notification
+        if (displayedNotifications.contains(notificationId)) {
+            Log.d(TAG, "Notificación ya mostrada: $notificationId")
+            return
+        }
+
+        displayedNotifications.add(notificationId)
+
         val intent = Intent(this, Class.forName("com.example.chatbasico.MainChats"))
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
@@ -128,6 +137,5 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
         Log.d(TAG, "✅ Notificación mostrada")
-
     }
 }

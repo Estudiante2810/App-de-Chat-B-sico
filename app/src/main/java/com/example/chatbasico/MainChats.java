@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -40,6 +41,9 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
     private FirebaseAuth mAuth;
     private FirebaseFirestore database;
     private String nombreUsuario;
+
+    private ListenerRegistration notificationListener;
+
 
     // Lista de usuarios y adapter
     private List<Usuario> usuarios;
@@ -71,7 +75,7 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
         setListeners();
         loadUsers();
 
-        // NUEVO: Iniciar listener de notificaciones
+        //  Iniciar listener de notificaciones
         startNotificationListener();
     }
 
@@ -84,11 +88,17 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
             return;
         }
 
+
+        if (notificationListener != null) {
+            Log.w(TAG, "🔁 Listener de notificaciones ya activo, no se creará otro");
+            return;
+        }
+
         String userId = mAuth.getCurrentUser().getUid();
         Log.d(TAG, "=== INICIANDO LISTENER DE NOTIFICACIONES ===");
         Log.d(TAG, "Usuario ID: " + userId);
 
-        database.collection("notifications")
+        notificationListener = database.collection("notifications")
                 .whereEqualTo("recipientId", userId)
                 .whereEqualTo("read", false)
                 .addSnapshotListener((snapshots, error) -> {
@@ -98,30 +108,25 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
                     }
 
                     if (snapshots != null) {
-                        Log.d(TAG, "📬 Cambios detectados en notificaciones. Total: " + snapshots.getDocumentChanges().size());
+                        Log.d(TAG, "📬 Cambios detectados en notificaciones: " + snapshots.getDocumentChanges().size());
 
                         snapshots.getDocumentChanges().forEach(change -> {
                             if (change.getType() == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
                                 String senderName = change.getDocument().getString("senderName");
                                 String messageText = change.getDocument().getString("messageText");
 
-                                Log.d(TAG, "🔔 Nueva notificación de: " + senderName);
-                                Log.d(TAG, "Mensaje: " + messageText);
+                                Log.d(TAG, " Nueva notificación: " + senderName + " - " + messageText);
 
-                                // Mostrar notificación local
-                                String notificationId = change.getDocument().getId();
                                 NotificationHelper.showLocalNotification(
-                                    this,
-                                    senderName + " te envió un mensaje",
-                                    messageText,
-                                    notificationId
+                                        this,
+                                        senderName + " te envió un mensaje",
+                                        messageText,
+                                        change.getDocument().getId()
                                 );
 
                                 // Marcar como leída
                                 change.getDocument().getReference().update("read", true)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d(TAG, "✅ Notificación marcada como leída");
-                                    });
+                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "✅ Notificación marcada como leída"));
                             }
                         });
                     }
@@ -129,6 +134,7 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
 
         Log.d(TAG, "✅ Listener de notificaciones iniciado correctamente");
     }
+
 
     private void init() {
         Log.d(TAG, "=== Inicializando componentes ===");
@@ -279,7 +285,8 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
         Log.d(TAG, "=== Consulta Firestore iniciada ===");
     }
 
-    private void showToast(String message) {
+
+        private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
@@ -357,7 +364,16 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
         startActivity(intent);
     }
 
-    // Clase simple para representar un usuario
+    protected void onDestroy() {
+        super.onDestroy();
+        if (notificationListener != null) {
+            notificationListener.remove();
+            notificationListener = null;
+            Log.d(TAG, " Listener de notificaciones eliminado");
+        }
+
+    }
+        // Clase simple para representar un usuario
     public static class Usuario {
         public String id;
         public String nombre;
