@@ -19,7 +19,7 @@ import androidx.core.app.NotificationManagerCompat;
 public class NotificationHelper {
 
     private static final String TAG = "NotificationHelper";
-    public static final String CHANNEL_ID = "chat_messages_channel";
+    public static final String CHANNEL_ID = "chat_message_channel";
     private static final String CHANNEL_NAME = "Mensajes de Chat";
     private static final String CHANNEL_DESCRIPTION = "Notificaciones de mensajes nuevos en el chat";
 
