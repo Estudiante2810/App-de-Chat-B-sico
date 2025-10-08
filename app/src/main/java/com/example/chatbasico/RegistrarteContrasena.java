@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class RegistrarteContrasena extends AppCompatActivity {
 
-    String nombre;
+    String email;
     EditText contrasena;
     Button botonFinalizar;
     FirebaseAuth mAuth;
@@ -42,7 +42,7 @@ public class RegistrarteContrasena extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
 
         Intent intent = getIntent();
-        nombre = intent.getStringExtra("nombre_usuario");
+        email = intent.getStringExtra("email");
 
         contrasena = findViewById(R.id.Contasena_usuario);
         botonFinalizar = findViewById(R.id.Boton_finalizar);
@@ -60,19 +60,17 @@ public class RegistrarteContrasena extends AppCompatActivity {
                 return;
             }
             
-            if (nombre == null || nombre.isEmpty()) {
-                Toast.makeText(this, "Error: No se pudo obtener el nombre del usuario", Toast.LENGTH_SHORT).show();
+            if (email == null || email.isEmpty()) {
+                Toast.makeText(this, "Error: No se pudo obtener el email del usuario", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            crearUsuarioFirebase(nombre, password);
+            crearUsuarioFirebase(email, password);
         });
 
     }
 
-    private void crearUsuarioFirebase(String nombreUsuario, String password) {
-        String email = nombreUsuario.toLowerCase().replaceAll("\\s+", "") + "@chatbasico.com";
-        
+    private void crearUsuarioFirebase(String email, String password) {
         // Mostrar loading
         Toast.makeText(this, "Creando usuario...", Toast.LENGTH_SHORT).show();
         botonFinalizar.setEnabled(false);
@@ -85,6 +83,9 @@ public class RegistrarteContrasena extends AppCompatActivity {
                         // Usuario creado exitosamente
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
+                            // Extraer nombre del email para guardarlo
+                            String nombreUsuario = email.substring(0, email.indexOf("@"));
+                            
                             // Guardar usuario en Firestore
                             guardarUsuarioEnFirestore(user.getUid(), nombreUsuario, email);
                             Intent intent = new Intent(this, Inicio_seccion.class);
@@ -97,7 +98,7 @@ public class RegistrarteContrasena extends AppCompatActivity {
                             String exception = task.getException().getMessage();
                             if (exception != null) {
                                 if (exception.contains("email address is already in use")) {
-                                    errorMessage = "Este nombre de usuario ya está en uso";
+                                    errorMessage = "Este email ya está en uso";
                                 } else if (exception.contains("weak password")) {
                                     errorMessage = "La contraseña es muy débil";
                                 } else {

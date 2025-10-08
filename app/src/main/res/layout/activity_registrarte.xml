@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:hint="Nombre de usuario"
+            android:hint="Email (ej: usuario@gmail.com)"
             android:inputType="text"
             android:layout_margin="10dp"
             android:background="@drawable/rectangulo_redondo"
