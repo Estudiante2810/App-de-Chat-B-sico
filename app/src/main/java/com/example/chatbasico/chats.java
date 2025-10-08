@@ -31,6 +31,7 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,7 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+import android.view.inputmethod.EditorInfo;
+import android.view.KeyEvent;
 public class chats extends AppCompatActivity {
 
     private static final String TAG = "ChatsActivity";
@@ -75,6 +77,9 @@ public class chats extends AppCompatActivity {
 
     // Para seleccionar imágenes
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+
+    // Listener registration
+    private ListenerRegistration messageListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,9 +175,14 @@ public class chats extends AppCompatActivity {
 
         // También permitir enviar mensaje con Enter
         chatMessageInput.setOnEditorActionListener((v, actionId, event) -> {
-            sendMessage();
-            return true;
+            if (actionId == EditorInfo.IME_ACTION_SEND ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                sendMessage();
+                return true;
+            }
+            return false;
         });
+
     }
 
     // En lugar de usar un solo fcmToken, obtener la lista de tokens
@@ -240,17 +250,21 @@ public class chats extends AppCompatActivity {
                     Log.e(TAG, "❌ Error al registrar notificación en Firestore", e);
                 });
     }
-
     private void loadMessages() {
         if (conversationId == null) {
             Log.e(TAG, "No se puede cargar mensajes: conversationId es null");
             return;
         }
 
+        // Remover listener anterior si existe
+        if (messageListener != null) {
+            messageListener.remove();
+        }
+
         Log.d(TAG, "Cargando mensajes para conversación: " + conversationId);
 
-        // Escuchar mensajes en tiempo real
-        database.collection("conversations")
+        // Crear nuevo listener y guardarlo
+        messageListener = database.collection("conversations")
                 .document(conversationId)
                 .collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -267,20 +281,27 @@ public class chats extends AppCompatActivity {
 
                             for (DocumentChange documentChange : value.getDocumentChanges()) {
                                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
-                                    // Nuevo mensaje
                                     Message message = documentChange.getDocument().toObject(Message.class);
                                     message.setId(documentChange.getDocument().getId());
 
                                     Log.d(TAG, "Nuevo mensaje: " + message.getText());
                                     chatAdapter.addMessage(message);
 
-                                    // Scroll al último mensaje
                                     conversationRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
                                 }
                             }
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remover listener para evitar memory leaks
+        if (messageListener != null) {
+            messageListener.remove();
+        }
     }
 
     @Override
@@ -471,4 +492,5 @@ public class chats extends AppCompatActivity {
                     Toast.makeText(this, "Error al enviar mensaje", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

@@ -21,7 +21,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onCreate() {
         super.onCreate()
         // Escuchar notificaciones pendientes en Firestore
-        listenForNotifications()
+      //  listenForNotifications()
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -128,7 +128,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
         Log.d(TAG, "✅ Notificación mostrada")
-            .
 
     }
 }

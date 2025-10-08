@@ -81,19 +81,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
-        
         switch (getItemViewType(position)) {
             case VIEW_TYPE_SENT_TEXT:
-                ((SentMessageViewHolder) holder).bind(message);
+                ((SentMessageViewHolder) holder).bind(message, position);
                 break;
             case VIEW_TYPE_RECEIVED_TEXT:
-                ((ReceivedMessageViewHolder) holder).bind(message);
+                ((ReceivedMessageViewHolder) holder).bind(message, position);
                 break;
             case VIEW_TYPE_SENT_IMAGE:
-                ((SentImageViewHolder) holder).bind(message);
+                ((SentImageViewHolder) holder).bind(message, position);
                 break;
             case VIEW_TYPE_RECEIVED_IMAGE:
-                ((ReceivedImageViewHolder) holder).bind(message);
+                ((ReceivedImageViewHolder) holder).bind(message, position);
                 break;
         }
     }
@@ -114,13 +113,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textDateTime = itemView.findViewById(R.id.textDateTime);
         }
         
-        void bind(Message message) {
+        void bind(Message message, int position) {
             textMessage.setText(message.getText());
-            
+            // Si el mensaje tiene timestamp, mostrarlo. Si no, mostrar la hora actual del dispositivo
             if (message.getTimestamp() != null) {
                 textDateTime.setText(dateFormat.format(message.getTimestamp()));
             } else {
-                textDateTime.setText("Enviando...");
+                textDateTime.setText(dateFormat.format(System.currentTimeMillis()));
             }
         }
     }
@@ -138,14 +137,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textDateTime = itemView.findViewById(R.id.textDateTime);
         }
         
-        void bind(Message message) {
+        void bind(Message message, int position) {
             textSenderName.setText(message.getSenderName());
             textMessage.setText(message.getText());
-            
+            // Si el mensaje tiene timestamp, mostrarlo. Si no, mostrar la hora actual del dispositivo
             if (message.getTimestamp() != null) {
                 textDateTime.setText(dateFormat.format(message.getTimestamp()));
             } else {
-                textDateTime.setText("...");
+                textDateTime.setText(dateFormat.format(System.currentTimeMillis()));
             }
         }
     }
@@ -163,7 +162,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             progressBar = itemView.findViewById(R.id.progressBar);
         }
         
-        void bind(Message message) {
+        void bind(Message message, int position) {
             if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
                 progressBar.setVisibility(View.GONE);
                 Glide.with(itemView.getContext())
@@ -175,11 +174,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 progressBar.setVisibility(View.VISIBLE);
                 imageMessage.setImageResource(R.drawable.ic_image);
             }
-            
+            // Si el mensaje tiene timestamp, mostrarlo. Si no, mostrar la hora actual del dispositivo
             if (message.getTimestamp() != null) {
                 textDateTime.setText(dateFormat.format(message.getTimestamp()));
             } else {
-                textDateTime.setText("Enviando...");
+                textDateTime.setText(dateFormat.format(System.currentTimeMillis()));
             }
         }
     }
@@ -199,9 +198,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             progressBar = itemView.findViewById(R.id.progressBar);
         }
         
-        void bind(Message message) {
+        void bind(Message message, int position) {
             textSenderName.setText(message.getSenderName());
-            
             if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
                 progressBar.setVisibility(View.GONE);
                 Glide.with(itemView.getContext())
@@ -213,11 +211,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 progressBar.setVisibility(View.VISIBLE);
                 imageMessage.setImageResource(R.drawable.ic_image);
             }
-            
+            // Si el mensaje tiene timestamp, mostrarlo. Si no, mostrar la hora actual del dispositivo
             if (message.getTimestamp() != null) {
                 textDateTime.setText(dateFormat.format(message.getTimestamp()));
             } else {
-                textDateTime.setText("...");
+                textDateTime.setText(dateFormat.format(System.currentTimeMillis()));
             }
         }
     }

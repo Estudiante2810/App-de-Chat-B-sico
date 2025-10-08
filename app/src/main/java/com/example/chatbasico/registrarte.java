@@ -40,7 +40,7 @@ public class registrarte extends AppCompatActivity {
             String nombreUsuario = nombre.getText().toString().trim();
 
             if (nombreUsuario.isEmpty()) {
-                Toast.makeText(this, "Por favor ingresa tu nombre", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Favor Ingresar su nombre", Toast.LENGTH_SHORT).show();
             } else {
                 // Aquí guardas el nombre, por ejemplo en SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MisDatos", MODE_PRIVATE);

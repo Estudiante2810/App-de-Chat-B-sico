@@ -51,7 +51,7 @@ public class RegistrarteContrasena extends AppCompatActivity {
             String password = contrasena.getText().toString().trim();
             
             if (password.isEmpty()) {
-                Toast.makeText(this, "Por favor ingresa una contraseña", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Favor ingresar  contraseña", Toast.LENGTH_SHORT).show();
                 return;
             }
             
