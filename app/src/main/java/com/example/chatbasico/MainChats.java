@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -41,9 +40,6 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
     private FirebaseAuth mAuth;
     private FirebaseFirestore database;
     private String nombreUsuario;
-
-    private ListenerRegistration notificationListener;
-
 
     // Lista de usuarios y adapter
     private List<Usuario> usuarios;
@@ -75,66 +71,8 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
         setListeners();
         loadUsers();
 
-        //  Iniciar listener de notificaciones
-        startNotificationListener();
+        Log.d(TAG, "✅ MainChats iniciado - Firebase Functions manejará las notificaciones automáticamente");
     }
-
-    /**
-     * NUEVO MÉTODO: Inicia el listener de notificaciones de Firestore
-     */
-    private void startNotificationListener() {
-        if (mAuth.getCurrentUser() == null) {
-            Log.w(TAG, "No se puede iniciar listener: usuario no autenticado");
-            return;
-        }
-
-
-        if (notificationListener != null) {
-            Log.w(TAG, "🔁 Listener de notificaciones ya activo, no se creará otro");
-            return;
-        }
-
-        String userId = mAuth.getCurrentUser().getUid();
-        Log.d(TAG, "=== INICIANDO LISTENER DE NOTIFICACIONES ===");
-        Log.d(TAG, "Usuario ID: " + userId);
-
-        notificationListener = database.collection("notifications")
-                .whereEqualTo("recipientId", userId)
-                .whereEqualTo("read", false)
-                .addSnapshotListener((snapshots, error) -> {
-                    if (error != null) {
-                        Log.e(TAG, "❌ Error escuchando notificaciones", error);
-                        return;
-                    }
-
-                    if (snapshots != null) {
-                        Log.d(TAG, "📬 Cambios detectados en notificaciones: " + snapshots.getDocumentChanges().size());
-
-                        snapshots.getDocumentChanges().forEach(change -> {
-                            if (change.getType() == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
-                                String senderName = change.getDocument().getString("senderName");
-                                String messageText = change.getDocument().getString("messageText");
-
-                                Log.d(TAG, " Nueva notificación: " + senderName + " - " + messageText);
-
-                                NotificationHelper.showLocalNotification(
-                                        this,
-                                        senderName + " te envió un mensaje",
-                                        messageText,
-                                        change.getDocument().getId()
-                                );
-
-                                // Marcar como leída
-                                change.getDocument().getReference().update("read", true)
-                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "✅ Notificación marcada como leída"));
-                            }
-                        });
-                    }
-                });
-
-        Log.d(TAG, "✅ Listener de notificaciones iniciado correctamente");
-    }
-
 
     private void init() {
         Log.d(TAG, "=== Inicializando componentes ===");
@@ -364,16 +302,7 @@ public class MainChats extends AppCompatActivity implements UsersAdapter.OnUserC
         startActivity(intent);
     }
 
-    protected void onDestroy() {
-        super.onDestroy();
-        if (notificationListener != null) {
-            notificationListener.remove();
-            notificationListener = null;
-            Log.d(TAG, " Listener de notificaciones eliminado");
-        }
-
-    }
-        // Clase simple para representar un usuario
+    // Clase simple para representar un usuario
     public static class Usuario {
         public String id;
         public String nombre;

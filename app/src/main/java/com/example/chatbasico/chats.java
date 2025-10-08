@@ -185,88 +185,6 @@ public class chats extends AppCompatActivity {
 
     }
 
-    // En lugar de usar un solo fcmToken, obtener la lista de tokens
-    private void sendNotificationToUser(String receiverId, String senderName, String messageText) {
-        // Obtener todos los FCM tokens del usuario receptor
-        database.collection("users").document(receiverId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        List<String> fcmTokens = new ArrayList<>();
-
-                        // Obtener lista de tokens (nuevo formato)
-                        if (documentSnapshot.contains("fcmTokens")) {
-                            List<String> tokensList = (List<String>) documentSnapshot.get("fcmTokens");
-                            if (tokensList != null) {
-                                fcmTokens.addAll(tokensList);
-                            }
-                        }
-
-                        // También incluir el token individual (compatibilidad)
-                        String singleToken = documentSnapshot.getString("fcmToken");
-                        if (singleToken != null && !fcmTokens.contains(singleToken)) {
-                            fcmTokens.add(singleToken);
-                        }
-
-                        Log.d(TAG, "Enviando notificación a " + fcmTokens.size() + " dispositivos");
-
-                        // Enviar notificación a cada token (cada dispositivo)
-                        for (String token : fcmTokens) {
-                            sendNotificationToToken(token, senderName, messageText);
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error obteniendo tokens del usuario", e);
-                });
-    }
-
-    private void sendNotificationToToken(String token, String senderName, String messageText) {
-        if (token == null || token.isEmpty()) {
-            Log.w(TAG, "⚠️ No se puede enviar notificación: token nulo o vacío");
-            return;
-        }
-
-        Log.d(TAG, "📤 Enviando notificación al token: " + token);
-
-        // Generar un ID único para esta notificación basado en la conversación y el mensaje
-        String notificationId = conversationId + "_" + messageText.hashCode();
-
-        // Verificar si la notificación ya existe en Firestore
-        database.collection("notifications")
-                .document(notificationId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Log.d(TAG, "⚠️ Notificación ya registrada en Firestore con ID: " + notificationId);
-                        return;
-                    }
-
-                    // Crear documento de notificación en Firestore
-                    Map<String, Object> notification = new HashMap<>();
-                    notification.put("recipientId", receiverUserId);
-                    notification.put("recipientName", receiverUserName);
-                    notification.put("senderId", currentUserId);
-                    notification.put("senderName", currentUserName);
-                    notification.put("fcmToken", token);
-                    notification.put("messageText", messageText);
-                    notification.put("timestamp", com.google.firebase.firestore.FieldValue.serverTimestamp());
-                    notification.put("read", false);
-
-                    database.collection("notifications")
-                            .document(notificationId)
-                            .set(notification)
-                            .addOnSuccessListener(unused -> {
-                                Log.d(TAG, "✅ Notificación registrada en Firestore con ID: " + notificationId);
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e(TAG, "❌ Error al registrar notificación en Firestore", e);
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "❌ Error al verificar notificación en Firestore", e);
-                });
-    }
     private void loadMessages() {
         if (conversationId == null) {
             Log.e(TAG, "No se puede cargar mensajes: conversationId es null");
@@ -480,6 +398,7 @@ public class chats extends AppCompatActivity {
         Log.d(TAG, "- De: " + currentUserName + " (ID: " + currentUserId + ")");
         Log.d(TAG, "- Para: " + receiverUserName + " (ID: " + receiverUserId + ")");
         Log.d(TAG, "- Mensaje: " + messageText);
+        Log.d(TAG, "🔍 DEBUG: Conversación ID: " + conversationId);
 
         // Crear objeto para Firestore
         Map<String, Object> message = new HashMap<>();
@@ -492,20 +411,25 @@ public class chats extends AppCompatActivity {
         message.put("messageType", Message.TYPE_TEXT);
         message.put("conversationId", conversationId);
 
+        Log.d(TAG, "🔍 DEBUG: Objeto mensaje creado: " + message.toString());
+        Log.d(TAG, "🔍 DEBUG: Ruta Firestore: conversations/" + conversationId + "/messages");
+
         // Guardar mensaje en Firestore
+        // Firebase Functions automáticamente detectará este nuevo mensaje y enviará las notificaciones push
         database.collection("conversations")
                 .document(conversationId)
                 .collection("messages")
                 .add(message)
                 .addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "✅ Mensaje enviado con ID: " + documentReference.getId());
+                    Log.d(TAG, "🔍 DEBUG: Ruta completa: " + documentReference.getPath());
+                    Log.d(TAG, "📡 Firebase Functions debería detectar este mensaje automáticamente");
+                    Log.d(TAG, "🔍 DEBUG: Esperando que Firebase Functions procese la notificación...");
                     chatMessageInput.setText("");
-
-                    // Enviar notificación al destinatario
-                    sendNotificationToUser(receiverUserId, currentUserName, messageText);
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "❌ Error al enviar mensaje", e);
+                    Log.e(TAG, "🔍 DEBUG: Error detallado: " + e.getMessage());
                     Toast.makeText(this, "Error al enviar mensaje", Toast.LENGTH_SHORT).show();
                 });
     }
